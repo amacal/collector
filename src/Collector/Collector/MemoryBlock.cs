@@ -26,7 +26,7 @@ namespace Collector
             data[index] = value;
         }
 
-        public void Set(long index, byte[] source, int offset, int length)
+        public void Set(int index, byte[] source, int offset, int length)
         {
             Array.Copy(source, offset, data, index, length);
         }

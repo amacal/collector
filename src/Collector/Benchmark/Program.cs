@@ -41,6 +41,13 @@ namespace Benchmark
                 }
             }
 
+            for (int i = 0; i < collectible.Count; i++)
+            {
+                Page page = collectible.At(serializer, i);
+
+                Console.WriteLine($"{i} {page.Id} {page.Revisions.Length} {page.Title}");
+            }
+
             Console.ReadLine();
         }
 

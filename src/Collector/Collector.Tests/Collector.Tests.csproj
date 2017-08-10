@@ -36,6 +36,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddressableTests.cs" />
     <Compile Include="CollectibleTests.cs" />
     <Compile Include="IndexPositionTests.cs" />
     <Compile Include="IndexTests.cs" />

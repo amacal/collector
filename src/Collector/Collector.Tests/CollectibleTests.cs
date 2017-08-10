@@ -36,5 +36,27 @@ namespace Collector.Tests
             Assert.That(found.Value, Is.EqualTo(0x1234));
             Assert.That(found.Text, Is.EqualTo("abc"));
         }
+
+        [Test]
+        public void ShouldHaveInitialSize()
+        {
+            Collectible collectible = new Collectible(1024);
+
+            Assert.That(collectible.TotalSize, Is.EqualTo(0));
+            Assert.That(collectible.UsedSize, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ShouldHaveIncreasedSize()
+        {
+            Reflector reflector = new Reflector();
+            Collectible collectible = new Collectible(1024);
+
+            Serializer<Item> serializer = reflector.GetSerializer<Item>(); ;
+            collectible.Add(serializer, new Item { Value = 0x1234, Text = "abc" });
+
+            Assert.That(collectible.TotalSize, Is.EqualTo(2048));
+            Assert.That(collectible.UsedSize, Is.EqualTo(23));
+        }
     }
 }

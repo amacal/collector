@@ -37,5 +37,17 @@ namespace Collector.Tests
 
             Assert.That(memory.Get(10732), Is.EqualTo(17));
         }
+
+        [Test]
+        public void ShouldModifyRequestedRangeBetweenBlocks()
+        {
+            Memory memory = new Memory(1024);
+            memory.Set(1022, new byte[] { 15, 16, 17, 18 });
+
+            Assert.That(memory.Get(1022), Is.EqualTo(15));
+            Assert.That(memory.Get(1023), Is.EqualTo(16));
+            Assert.That(memory.Get(1024), Is.EqualTo(17));
+            Assert.That(memory.Get(1025), Is.EqualTo(18));
+        }
     }
 }

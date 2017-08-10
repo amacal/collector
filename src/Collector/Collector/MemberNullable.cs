@@ -29,6 +29,7 @@ namespace Collector
                 return 1;
             }
 
+            destination.Set(index, 1);
             return inner.Transfer(source, destination, index + 1) + 1;
         }
 

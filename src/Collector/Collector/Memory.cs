@@ -44,7 +44,7 @@ namespace Collector
                 MemoryBlock block = GetOrCreate(index + offset);
                 int length = Math.Min(data.Length - offset, blockSize - ToMinor(index));
 
-                block.Set(ToMinor(index), data, offset, length);
+                block.Set(ToMinor(index + offset), data, offset, length);
                 offset = offset + length;
             }
         }
