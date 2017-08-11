@@ -30,12 +30,7 @@ namespace Collector
             return GetOrCreate(index).Get(ToMinor(index));
         }
 
-        public void Set(long index, byte value)
-        {
-            GetOrCreate(index).Set(ToMinor(index), value);
-        }
-
-        public void Set(long index, byte[] data)
+        public void GetBytes(long index, byte[] data)
         {
             int offset = 0;
 
@@ -44,7 +39,26 @@ namespace Collector
                 MemoryBlock block = GetOrCreate(index + offset);
                 int length = Math.Min(data.Length - offset, blockSize - ToMinor(index));
 
-                block.Set(ToMinor(index + offset), data, offset, length);
+                block.GetBytes(ToMinor(index + offset), data, offset, length);
+                offset = offset + length;
+            }
+        }
+
+        public void Set(long index, byte value)
+        {
+            GetOrCreate(index).Set(ToMinor(index), value);
+        }
+
+        public void SetBytes(long index, byte[] data)
+        {
+            int offset = 0;
+
+            while (offset < data.Length)
+            {
+                MemoryBlock block = GetOrCreate(index + offset);
+                int length = Math.Min(data.Length - offset, blockSize - ToMinor(index));
+
+                block.SetBytes(ToMinor(index + offset), data, offset, length);
                 offset = offset + length;
             }
         }

@@ -44,5 +44,10 @@
             serializer.Transfer(source, destination);
             return destination;
         }
+
+        public void Swap(long left, long right)
+        {
+            index.Swap(left, right);
+        }
     }
 }

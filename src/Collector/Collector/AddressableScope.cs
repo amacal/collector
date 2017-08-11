@@ -16,14 +16,19 @@
             return target.Get(index + position);
         }
 
+        public void GetBytes(long index, byte[] data)
+        {
+            target.GetBytes(index + position, data);
+        }
+
         public void Set(long index, byte value)
         {
             target.Set(index + position, value);
         }
 
-        public void Set(long index, byte[] data)
+        public void SetBytes(long index, byte[] data)
         {
-            target.Set(index + position, data);
+            target.SetBytes(index + position, data);
         }
 
         public Addressable Scope(int offset)

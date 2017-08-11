@@ -27,12 +27,17 @@ namespace Collector.Tests
             return data[index];
         }
 
+        public void GetBytes(long index, byte[] value)
+        {
+            Array.Copy(data, index, value, 0, value.Length);
+        }
+
         public void Set(long index, byte value)
         {
             data[index] = value;
         }
 
-        public void Set(long index, byte[] value)
+        public void SetBytes(long index, byte[] value)
         {
             Array.Copy(value, 0, data, index, value.Length);
         }

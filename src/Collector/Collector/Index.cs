@@ -36,5 +36,17 @@
         {
             return memory.ReadInt64(position.At(index));
         }
+
+        public void Swap(long left, long right)
+        {
+            left = position.At(left);
+            right = position.At(right);
+
+            long iLeft = memory.ReadInt64(left);
+            long iRight = memory.ReadInt64(right);
+
+            memory.WriteInt64(left, iRight);
+            memory.WriteInt64(right, iLeft);
+        }
     }
 }

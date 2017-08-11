@@ -41,5 +41,18 @@ namespace Collector.Tests
 
             Assert.That(index.Count, Is.EqualTo(2));
         }
+
+        [Test]
+        public void ShouldSwapItems()
+        {
+            Index index = new Index(1024);
+
+            index.Add(1245);
+            index.Add(2345);
+            index.Swap(0, 1);
+
+            Assert.That(index.At(0), Is.EqualTo(2345));
+            Assert.That(index.At(1), Is.EqualTo(1245));
+        }
     }
 }

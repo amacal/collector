@@ -39,10 +39,48 @@ namespace Collector.Tests
         }
 
         [Test]
+        public void ShouldReadRequestedRange()
+        {
+            byte[] store = new byte[2];
+            Memory memory = new Memory(1024);
+
+            memory.Set(10, 15);
+            memory.Set(11, 16);
+
+            memory.GetBytes(10, store);
+            Assert.That(store, Is.EqualTo(new byte[] { 15, 16 }));
+        }
+
+        [Test]
+        public void ShouldModifyRequestedRange()
+        {
+            Memory memory = new Memory(1024);
+            memory.SetBytes(10, new byte[] { 15, 16 });
+
+            Assert.That(memory.Get(10), Is.EqualTo(15));
+            Assert.That(memory.Get(11), Is.EqualTo(16));
+        }
+
+        [Test]
+        public void ShouldReadRequestedRangeBetweenBlocks()
+        {
+            byte[] store = new byte[4];
+            Memory memory = new Memory(1024);
+
+            memory.Set(1022, 15);
+            memory.Set(1023, 16);
+            memory.Set(1024, 17);
+            memory.Set(1025, 18);
+
+            memory.GetBytes(1022, store);
+            Assert.That(store, Is.EqualTo(new byte[] { 15, 16, 17, 18 }));
+        }
+
+        [Test]
         public void ShouldModifyRequestedRangeBetweenBlocks()
         {
             Memory memory = new Memory(1024);
-            memory.Set(1022, new byte[] { 15, 16, 17, 18 });
+            memory.SetBytes(1022, new byte[] { 15, 16, 17, 18 });
 
             Assert.That(memory.Get(1022), Is.EqualTo(15));
             Assert.That(memory.Get(1023), Is.EqualTo(16));

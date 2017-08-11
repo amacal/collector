@@ -21,14 +21,19 @@
             return memory.Get(position.Value + index);
         }
 
+        public void GetBytes(long index, byte[] data)
+        {
+            memory.GetBytes(position.Value + index, data);
+        }
+
         public void Set(long index, byte value)
         {
             memory.Set(position.Value + index, value);
         }
 
-        public void Set(long index, byte[] data)
+        public void SetBytes(long index, byte[] data)
         {
-            memory.Set(position.Value + index, data);
+            memory.SetBytes(position.Value + index, data);
         }
     }
 }

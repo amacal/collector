@@ -33,7 +33,7 @@ namespace Collector
             if (value != null)
             {
                 byte[] bytes = Encoding.UTF8.GetBytes(value);
-                addressable.Set(index, bytes);
+                addressable.SetBytes(index, bytes);
             }
         }
 
@@ -72,10 +72,7 @@ namespace Collector
                 return String.Empty;
 
             byte[] bytes = new byte[length];
-            for (int i = 0; i < length; i++)
-            {
-                bytes[i] = addressable.Get(index + i);
-            }
+            addressable.GetBytes(index, bytes);
 
             return Encoding.UTF8.GetString(bytes);
         }
