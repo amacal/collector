@@ -35,10 +35,9 @@
             serializer.Transfer(data, allocation);
         }
 
-        public T At<T>(Serializer<T> serializer, long position)
-            where T : new()
+        public dynamic At<T>(Serializer<T> serializer, long position)
         {
-            T destination = new T();
+            Substitute destination = new Substitute();
             StorageAllocation source = storage.At(index.At(position));
 
             serializer.Transfer(source, destination);

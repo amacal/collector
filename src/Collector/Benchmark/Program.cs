@@ -46,7 +46,7 @@ namespace Benchmark
 
             for (int i = 0; i < 10; i++)
             {
-                Page page = collectible.At(serializer, i);
+                dynamic page = collectible.At(serializer, i);
 
                 Console.WriteLine($"{i} {page.Id} {page.Revisions.Length} {page.Title}");
             }

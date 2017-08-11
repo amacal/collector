@@ -16,6 +16,11 @@ namespace Collector
             this.property = property.Cast(x => x.Value, x => x);
         }
 
+        public string Name
+        {
+            get { return property.Name; }
+        }
+
         public int Measure(T source)
         {
             return 8;
@@ -27,9 +32,9 @@ namespace Collector
             return 8;
         }
 
-        public int Transfer(Addressable source, long index, T destination)
+        public int Transfer(Addressable source, long index, Substitute destination)
         {
-            property.SetValue(destination, new DateTime(source.ReadInt64(index)));
+            destination.Add(property.Name, () => new DateTime(source.ReadInt64(index)));
             return 8;
         }
     }

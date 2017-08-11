@@ -3,19 +3,18 @@ using System.Collections.Generic;
 
 namespace Collector
 {
-    public class SortBySelector<T, K> : SortBy<T>
-        where T : new()
+    public class SortBySelector<T> : SortBy
     {
         private readonly Serializer<T> serializer;
-        private readonly Func<T, K> selector;
+        private readonly Func<dynamic, dynamic> selector;
 
-        public SortBySelector(Serializer<T> serializer, Func<T, K> selector)
+        public SortBySelector(Serializer<T> serializer, Func<dynamic, dynamic> selector)
         {
             this.serializer = serializer;
             this.selector = selector;
         }
 
-        public T Extract(Collectible source, long index)
+        public dynamic Extract(Collectible source, long index)
         {
             return source.At(serializer, index);
         }
@@ -25,9 +24,9 @@ namespace Collector
             source.Swap(left, right);
         }
 
-        public bool IsLessThan(T left, T right)
+        public bool IsLessThan(dynamic left, dynamic right)
         {
-            return Comparer<K>.Default.Compare(selector(left), selector(right)) < 0;
+            return Comparer<dynamic>.Default.Compare(selector(left), selector(right)) < 0;
         }
     }
 }

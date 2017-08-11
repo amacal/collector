@@ -13,6 +13,11 @@ namespace Collector
             this.nullable = nullable;
         }
 
+        public string Name
+        {
+            get { return inner.Name; }
+        }
+
         public int Measure(T source)
         {
             if (nullable.IsNull(source))
@@ -33,11 +38,11 @@ namespace Collector
             return inner.Transfer(source, destination, index + 1) + 1;
         }
 
-        public int Transfer(Addressable source, long index, T destination)
+        public int Transfer(Addressable source, long index, Substitute destination)
         {
             if (source.Get(index) == 0)
             {
-                nullable.SetNull(destination);
+                destination.Add(inner.Name, () => null);
                 return 1;
             }
 

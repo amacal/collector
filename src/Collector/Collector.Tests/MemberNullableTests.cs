@@ -81,7 +81,7 @@ namespace Collector.Tests
             Member<Item> member = new MemberInt64<Item>(property);
             Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
 
-            Item item = new Item { Value = null };
+            dynamic item = new Substitute();
             MemoryMock memory = new MemoryMock(new byte[]
             {
                 0x01, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
@@ -100,7 +100,7 @@ namespace Collector.Tests
             Member<Item> member = new MemberInt64<Item>(property);
             Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
 
-            Item item = new Item { Value = 12 };
+            dynamic item = new Substitute();
             MemoryMock memory = new MemoryMock(new byte[] { 0x00 });
 
             nullable.Transfer(memory, 0, item);

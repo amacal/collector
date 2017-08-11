@@ -38,7 +38,7 @@
             return size;
         }
 
-        public int Transfer(Addressable source, T destination)
+        public int Transfer(Addressable source, Substitute destination)
         {
             int size = 0;
 

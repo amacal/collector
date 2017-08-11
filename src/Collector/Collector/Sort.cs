@@ -4,12 +4,12 @@ namespace Collector
 {
     public static class Sort
     {
-        public static Collectible Table<T>(Collectible source, SortBy<T> by)
+        public static Collectible Table(Collectible source, SortBy by)
         {
             void sort(long low, long high)
             {
                 long i = low, j = high;
-                T pivot = by.Extract(source, (low + high) / 2);
+                dynamic pivot = by.Extract(source, (low + high) / 2);
 
                 while (i < j)
                 {
@@ -34,10 +34,9 @@ namespace Collector
             return source;
         }
 
-        public static SortBy<T> By<T, K>(Serializer<T> serializer, Func<T, K> selector)
-            where T : new()
+        public static SortBy By<T>(Serializer<T> serializer, Func<dynamic, dynamic> selector)
         {
-            return new SortBySelector<T, K>(serializer, selector);
+            return new SortBySelector<T>(serializer, selector);
         }
     }
 }

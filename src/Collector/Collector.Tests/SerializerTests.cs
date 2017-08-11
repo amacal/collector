@@ -47,7 +47,7 @@ namespace Collector.Tests
                 130, 130, 130, 130, 130, 130, 130, 130, 130, 130
             });
 
-            Item item = new Item();
+            dynamic item = new Substitute();
             serializer.Transfer(mock, item);
 
             Assert.That(item.Value, Is.EqualTo(10));
@@ -60,6 +60,11 @@ namespace Collector.Tests
             public MemberMock(byte value)
             {
                 this.value = value;
+            }
+
+            public string Name
+            {
+                get { throw new System.NotImplementedException(); }
             }
 
             public int Measure(Item source)
@@ -77,7 +82,7 @@ namespace Collector.Tests
                 return value;
             }
 
-            public int Transfer(Addressable source, long index, Item destination)
+            public int Transfer(Addressable source, long index, Substitute destination)
             {
                 long sum = 0;
 
@@ -86,7 +91,7 @@ namespace Collector.Tests
                     sum = sum + source.Get(index + i);
                 }
 
-                destination.Value = (byte)(sum / value / value);
+                destination.Add("Value", () => (byte)(sum / value / value));
                 return value;
             }
         }

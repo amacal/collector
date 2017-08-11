@@ -72,7 +72,7 @@ namespace Collector.Tests
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
 
-            Item item = new Item();
+            dynamic item = new Substitute();
             Member<Item> member = new MemberString<Item>(property);
 
             MemoryMock memory = new MemoryMock(new byte[]
@@ -90,7 +90,7 @@ namespace Collector.Tests
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
 
-            Item item = new Item { Value = "x" };
+            dynamic item = new Substitute();
             Member<Item> member = new MemberString<Item>(property);
             MemoryMock memory = new MemoryMock(new byte[] { 0xff, 0xff, 0xff, 0xff });
 

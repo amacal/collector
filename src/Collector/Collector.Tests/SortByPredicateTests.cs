@@ -16,7 +16,7 @@ namespace Collector.Tests
             Serializer<Item> serializer = reflector.GetSerializer<Item>(); ;
 
             Collectible collectible = new Collectible(1024);
-            SortBySelector<Item, long> selector = new SortBySelector<Item, long>(serializer, x => x.Value);
+            SortBySelector<Item> selector = new SortBySelector<Item>(serializer, x => x.Value);
 
             collectible.Add(serializer, new Item { Value = 1 });
             Assert.That(selector.Extract(collectible, 0).Value, Is.EqualTo(1));
@@ -29,7 +29,7 @@ namespace Collector.Tests
             Serializer<Item> serializer = reflector.GetSerializer<Item>(); ;
 
             Collectible collectible = new Collectible(1024);
-            SortBySelector<Item, long> selector = new SortBySelector<Item, long>(serializer, x => x.Value);
+            SortBySelector<Item> selector = new SortBySelector<Item>(serializer, x => x.Value);
 
             collectible.Add(serializer, new Item { Value = 1 });
             collectible.Add(serializer, new Item { Value = 2 });
@@ -46,7 +46,7 @@ namespace Collector.Tests
             Serializer<Item> serializer = reflector.GetSerializer<Item>(); ;
 
             Collectible collectible = new Collectible(1024);
-            SortBySelector<Item, long> selector = new SortBySelector<Item, long>(serializer, x => x.Value);
+            SortBySelector<Item> selector = new SortBySelector<Item>(serializer, x => x.Value);
 
             collectible.Add(serializer, new Item { Value = 1 });
             collectible.Add(serializer, new Item { Value = 2 });
@@ -61,7 +61,7 @@ namespace Collector.Tests
             Serializer<Item> serializer = reflector.GetSerializer<Item>(); ;
 
             Collectible collectible = new Collectible(1024);
-            SortBySelector<Item, long> selector = new SortBySelector<Item, long>(serializer, x => x.Value);
+            SortBySelector<Item> selector = new SortBySelector<Item>(serializer, x => x.Value);
 
             collectible.Add(serializer, new Item { Value = 1 });
             collectible.Add(serializer, new Item { Value = 2 });

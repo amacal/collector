@@ -47,7 +47,7 @@ namespace Collector.Tests
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, Int64> property = new ReflectorProperty<Item, long>(info);
 
-            Item item = new Item();
+            dynamic item = new Substitute();
             Member<Item> member = new MemberInt64<Item>(property);
 
             MemoryMock memory = new MemoryMock(new byte[]

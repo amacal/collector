@@ -14,6 +14,11 @@ namespace Collector
             this.nested = nested;
         }
 
+        public string Name
+        {
+            get { return property.Name; }
+        }
+
         public int Measure(T source)
         {
             V[] value = property.GetValue(source);
@@ -24,11 +29,12 @@ namespace Collector
 
         public int Transfer(T source, Addressable destination, long index)
         {
+            long initial = index;
             V[] value = property.GetValue(source);
             int length = value?.Length ?? -1;
 
-            destination.WriteInt32(index + 0, length);
-            index = index + 4;
+            destination.WriteInt32(initial + 4, length);
+            index = index + 8;
 
             if (value != null)
             {
@@ -38,24 +44,40 @@ namespace Collector
                 }
             }
 
-            return (int)index;
+            destination.WriteInt32(initial, (int)(index - initial));
+            return (int)(index - initial);
         }
 
-        public int Transfer(Addressable source, long index, T destination)
+        public int Transfer(Addressable source, long index, Substitute destination)
         {
-            int length = source.ReadInt32(index + 0);
-            V[] value = length >= 0 ? new V[length] : null;
+            int total = source.ReadInt32(index + 0);
 
-            index = index + 4;
-
-            for (int i = 0; i < length; i++)
+            destination.Add(property.Name, () =>
             {
-                value[i] = Activator.CreateInstance<V>();
-                index = index + nested.Transfer(source.Scope(index), value[i]);
-            }
+                int length = source.ReadInt32(index + 4);
+                SubstituteArray value = null;
 
-            property.SetValue(destination, value);
-            return (int)index;
+                object[] callback()
+                {
+                    Substitute[] items = new Substitute[length];
+                    index = index + 8;
+
+                    for (int i = 0; i < length; i++)
+                    {
+                        items[i] = new Substitute();
+                        index = index + nested.Transfer(source.Scope(index), items[i]);
+                    }
+
+                    return items;
+                }
+
+                if (length >= 0)
+                    value = new SubstituteArray(length, callback);
+
+                return value;
+            });
+
+            return total;
         }
 
         private int NormalizeLength(int value)

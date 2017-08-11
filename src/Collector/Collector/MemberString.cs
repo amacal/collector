@@ -12,6 +12,11 @@ namespace Collector
             this.property = property;
         }
 
+        public string Name
+        {
+            get { return property.Name; }
+        }
+
         public int Measure(T source)
         {
             string value = property.GetValue(source);
@@ -31,12 +36,12 @@ namespace Collector
             return NormalizeLength(length);
         }
 
-        public int Transfer(Addressable source, long index, T destination)
+        public int Transfer(Addressable source, long index, Substitute destination)
         {
             int length = source.ReadInt32(index + 0);
-            string value = source.ReadString(index + 4, length);
 
-            property.SetValue(destination, value);
+            destination.Add(property.Name, () => source.ReadString(index + 4, length));
+
             return NormalizeLength(length);
         }
 

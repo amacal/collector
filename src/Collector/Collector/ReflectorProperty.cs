@@ -5,19 +5,27 @@ namespace Collector
 {
     public class ReflectorProperty<T, V>
     {
+        private readonly string name;
         private readonly Func<T, V> getter;
         private readonly Action<T, V> setter;
 
         public ReflectorProperty(PropertyInfo property)
         {
+            this.name = property.Name;
             this.getter = (Func<T, V>)Delegate.CreateDelegate(typeof(Func<T, V>), property.GetGetMethod());
             this.setter = (Action<T, V>)Delegate.CreateDelegate(typeof(Action<T, V>), property.GetSetMethod());
         }
 
-        public ReflectorProperty(Func<T, V> getter, Action<T, V> setter)
+        public ReflectorProperty(string name, Func<T, V> getter, Action<T, V> setter)
         {
+            this.name = name;
             this.getter = getter;
             this.setter = setter;
+        }
+
+        public string Name
+        {
+            get { return name; }
         }
 
         public bool IsNull(T item)
@@ -45,7 +53,7 @@ namespace Collector
             U toGetter(T instance) => from(getter(instance));
             void toSetter(T instance, U value) => setter(instance, to(value));
 
-            return new ReflectorProperty<T, U>(toGetter, toSetter);
+            return new ReflectorProperty<T, U>(name, toGetter, toSetter);
         }
     }
 }

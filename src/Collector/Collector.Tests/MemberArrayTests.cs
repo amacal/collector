@@ -67,12 +67,12 @@ namespace Collector.Tests
             Member<Item> member = new MemberArray<Item, Entry>(valueProperty, nested);
             Item item = new Item { Entries = new[] { new Entry { Value = "abc" }, new Entry { Value = "cde" } } };
 
-            MemoryMock memory = new MemoryMock(20);
+            MemoryMock memory = new MemoryMock(30);
 
-            Assert.That(member.Transfer(item, memory, 0), Is.EqualTo(18));
-            Assert.That(memory.GetData(18), Is.EqualTo(new[]
+            Assert.That(member.Transfer(item, memory, 0), Is.EqualTo(22));
+            Assert.That(memory.GetData(22), Is.EqualTo(new[]
             {
-                0x00, 0x00, 0x00, 0x02,
+                0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x02,
                 0x00, 0x00, 0x00, 0x03, 0x61, 0x62, 0x63,
                 0x00, 0x00, 0x00, 0x03, 0x63, 0x64, 0x65
             }));
@@ -95,8 +95,11 @@ namespace Collector.Tests
 
             MemoryMock memory = new MemoryMock(20);
 
-            Assert.That(member.Transfer(item, memory, 0), Is.EqualTo(4));
-            Assert.That(memory.GetData(4), Is.EqualTo(new[] { 0xff, 0xff, 0xff, 0xff }));
+            Assert.That(member.Transfer(item, memory, 0), Is.EqualTo(8));
+            Assert.That(memory.GetData(8), Is.EqualTo(new[]
+            {
+                0x00, 0x00, 0x00, 0x08, 0xff, 0xff, 0xff, 0xff
+            }));
         }
 
         [Test]
@@ -112,16 +115,16 @@ namespace Collector.Tests
             Serializer<Entry> nested = new Serializer<Entry>(nestedMember);
 
             Member<Item> member = new MemberArray<Item, Entry>(valueProperty, nested);
-            Item item = new Item { Entries = null };
+            dynamic item = new Substitute();
 
             MemoryMock memory = new MemoryMock(new byte[]
             {
-                0x00, 0x00, 0x00, 0x02,
+                0x00, 0x00, 0x00, 0x16, 0x00, 0x00, 0x00, 0x02,
                 0x00, 0x00, 0x00, 0x03, 0x61, 0x62, 0x63,
                 0x00, 0x00, 0x00, 0x03, 0x63, 0x64, 0x65
             });
 
-            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(18));
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(22));
             Assert.That(item.Entries[0].Value, Is.EqualTo("abc"));
             Assert.That(item.Entries[1].Value, Is.EqualTo("cde"));
         }
@@ -139,11 +142,14 @@ namespace Collector.Tests
             Serializer<Entry> nested = new Serializer<Entry>(nestedMember);
 
             Member<Item> member = new MemberArray<Item, Entry>(valueProperty, nested);
-            Item item = new Item { Entries = new Entry[0] };
+            dynamic item = new Substitute();
 
-            MemoryMock memory = new MemoryMock(new byte[] { 0xff, 0xff, 0xff, 0xff });
+            MemoryMock memory = new MemoryMock(new byte[]
+            {
+                0x00, 0x00, 0x00, 0x08, 0xff, 0xff, 0xff, 0xff
+            });
 
-            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(4));
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(8));
             Assert.That(item.Entries, Is.Null);
         }
     }

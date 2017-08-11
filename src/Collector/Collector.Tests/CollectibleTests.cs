@@ -32,7 +32,7 @@ namespace Collector.Tests
             Collectible collectible = new Collectible(1024);
             collectible.Add(serializer, new Item { Value = 0x1234, Text = "abc" });
 
-            Item found = collectible.At(serializer, 0);
+            dynamic found = collectible.At(serializer, 0);
             Assert.That(found.Value, Is.EqualTo(0x1234));
             Assert.That(found.Text, Is.EqualTo("abc"));
         }
