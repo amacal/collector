@@ -40,7 +40,13 @@ namespace Collector
         {
             int length = source.ReadInt32(index + 0);
 
-            destination.Add(property.Name, () => source.ReadString(index + 4, length));
+            destination.Add(property.Name, () =>
+            {
+                if (length < 0)
+                    return null;
+
+                return new SubstituteText(length, () => source.ReadString(index + 4, length));
+            });
 
             return NormalizeLength(length);
         }

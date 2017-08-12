@@ -41,7 +41,7 @@ namespace Benchmark
                 }
             }
 
-            collectible = Sort.Table(collectible, Sort.By(serializer, x => -x.Revisions.Length));
+            collectible = Sort.Table(collectible, Sort.By(serializer, x => x.Title));
             Console.WriteLine($"{collectible.Count} {collectible.UsedSize} {collectible.TotalSize} {watch.Elapsed.TotalSeconds:F2}");
 
             for (int i = 0; i < 10; i++)

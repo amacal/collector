@@ -34,7 +34,7 @@ namespace Collector.Tests
 
             dynamic found = collectible.At(serializer, 0);
             Assert.That(found.Value, Is.EqualTo(0x1234));
-            Assert.That(found.Text, Is.EqualTo("abc"));
+            Assert.That(found.Text.ToString(), Is.EqualTo("abc"));
         }
 
         [Test]

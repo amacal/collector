@@ -81,7 +81,7 @@ namespace Collector.Tests
             });
 
             Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(7));
-            Assert.That(item.Value, Is.EqualTo("abc"));
+            Assert.That(item.Value.ToString(), Is.EqualTo("abc"));
         }
 
         [Test]
@@ -96,6 +96,43 @@ namespace Collector.Tests
 
             Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(4));
             Assert.That(item.Value, Is.Null);
+        }
+
+        [Test]
+        public void ShouldDeserializeOnlySize()
+        {
+            PropertyInfo info = typeof(Item).GetProperty("Value");
+            ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
+
+            dynamic item = new Substitute();
+            Member<Item> member = new MemberString<Item>(property);
+
+            MemoryMock memory = new MemoryMock(new byte[]
+            {
+                0x00, 0x00, 0x00, 0x03, 0x61, 0x62, 0x63
+            });
+
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(7));
+            Assert.That(memory.Accessed, Is.EqualTo(new[] { 0, 1, 2, 3 }));
+        }
+
+        [Test]
+        public void ShouldDeserializeOnlySizeEvenIfSizeAccessed()
+        {
+            PropertyInfo info = typeof(Item).GetProperty("Value");
+            ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
+
+            dynamic item = new Substitute();
+            Member<Item> member = new MemberString<Item>(property);
+
+            MemoryMock memory = new MemoryMock(new byte[]
+            {
+                0x00, 0x00, 0x00, 0x03, 0x61, 0x62, 0x63
+            });
+
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(7));
+            Assert.That(item.Value.Size, Is.EqualTo(3));
+            Assert.That(memory.Accessed, Is.EqualTo(new[] { 0, 1, 2, 3 }));
         }
     }
 }

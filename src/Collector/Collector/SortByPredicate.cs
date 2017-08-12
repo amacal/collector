@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Collector
 {
-    public class SortBySelector<T> : SortBy
+    public class SortByPredicate<T> : SortBy
     {
         private readonly Serializer<T> serializer;
         private readonly Func<dynamic, dynamic> selector;
 
-        public SortBySelector(Serializer<T> serializer, Func<dynamic, dynamic> selector)
+        public SortByPredicate(Serializer<T> serializer, Func<dynamic, dynamic> selector)
         {
             this.serializer = serializer;
             this.selector = selector;
@@ -26,7 +26,12 @@ namespace Collector
 
         public bool IsLessThan(dynamic left, dynamic right)
         {
-            return Comparer<dynamic>.Default.Compare(selector(left), selector(right)) < 0;
+            IComparer<IComparable> comparer = Comparer<IComparable>.Default;
+
+            IComparable cLeft = selector(left);
+            IComparable cRight = selector(right);
+
+            return comparer.Compare(cLeft, cRight) < 0;
         }
     }
 }

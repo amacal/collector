@@ -7,16 +7,16 @@ namespace Collector
     {
         private readonly string name;
         private readonly Func<T, V> getter;
-        private readonly Action<T, V> setter;
+        private readonly Action<Substitute, Func<V>> setter;
 
         public ReflectorProperty(PropertyInfo property)
         {
             this.name = property.Name;
             this.getter = (Func<T, V>)Delegate.CreateDelegate(typeof(Func<T, V>), property.GetGetMethod());
-            this.setter = (Action<T, V>)Delegate.CreateDelegate(typeof(Action<T, V>), property.GetSetMethod());
+            this.setter = (item, value) => item.Add(name, () => value());
         }
 
-        public ReflectorProperty(string name, Func<T, V> getter, Action<T, V> setter)
+        public ReflectorProperty(string name, Func<T, V> getter, Action<dynamic, Func<V>> setter)
         {
             this.name = name;
             this.getter = getter;
@@ -33,9 +33,9 @@ namespace Collector
             return getter.Invoke(item) == null;
         }
 
-        public void SetNull(T item)
+        public void SetNull(Substitute item)
         {
-            setter.Invoke(item, default(V));
+            setter.Invoke(item, () => default(V));
         }
 
         public V GetValue(T item)
@@ -43,7 +43,7 @@ namespace Collector
             return getter.Invoke(item);
         }
 
-        public void SetValue(T item, V value)
+        public void SetValue(Substitute item, Func<V> value)
         {
             setter.Invoke(item, value);
         }
@@ -51,7 +51,8 @@ namespace Collector
         public ReflectorProperty<T, U> Cast<U>(Func<V, U> from, Func<U, V> to)
         {
             U toGetter(T instance) => from(getter(instance));
-            void toSetter(T instance, U value) => setter(instance, to(value));
+            Func<V> convert(Func<U> source) => () => to(source());
+            void toSetter(dynamic instance, Func<U> value) => setter(instance, convert(value));
 
             return new ReflectorProperty<T, U>(name, toGetter, toSetter);
         }

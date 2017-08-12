@@ -36,7 +36,7 @@ namespace Collector
 
         public static SortBy By<T>(Serializer<T> serializer, Func<dynamic, dynamic> selector)
         {
-            return new SortBySelector<T>(serializer, selector);
+            return new SortByPredicate<T>(serializer, selector);
         }
     }
 }

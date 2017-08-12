@@ -58,7 +58,7 @@ namespace Collector.Tests
         [Test]
         public void ShouldSetNullInNullableString()
         {
-            Regular regular = new Regular { Value = "abc" };
+            dynamic regular = new Substitute();
             PropertyInfo info = typeof(Regular).GetProperty("Value");
             ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
 
@@ -69,7 +69,7 @@ namespace Collector.Tests
         [Test]
         public void ShouldSetNullInNullablePrimitive()
         {
-            Nullable nullable = new Nullable { Value = 123 };
+            dynamic nullable = new Substitute();
             PropertyInfo info = typeof(Nullable).GetProperty("Value");
             ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
 
@@ -100,33 +100,33 @@ namespace Collector.Tests
         [Test]
         public void ShouldSetValue()
         {
-            Regular regular = new Regular { Value = "abc" };
+            dynamic regular = new Substitute();
             PropertyInfo info = typeof(Regular).GetProperty("Value");
             ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
 
-            property.SetValue(regular, "cde");
+            property.SetValue((Substitute)regular, () => "cde");
             Assert.That(regular.Value, Is.EqualTo("cde"));
         }
 
         [Test]
         public void ShouldSetNullableValue()
         {
-            Nullable nullable = new Nullable { Value = null };
+            dynamic nullable = new Substitute();
             PropertyInfo info = typeof(Nullable).GetProperty("Value");
             ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
 
-            property.SetValue(nullable, 123);
+            property.SetValue((Substitute)nullable, () => 123);
             Assert.That(nullable.Value, Is.EqualTo(123));
         }
 
         [Test]
         public void ShouldSetNullableValueToNull()
         {
-            Nullable nullable = new Nullable { Value = 123 };
+            dynamic nullable = new Substitute();
             PropertyInfo info = typeof(Nullable).GetProperty("Value");
             ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
 
-            property.SetValue(nullable, null);
+            property.SetValue((Substitute)nullable, () => null);
             Assert.That(nullable.Value, Is.Null);
         }
 
@@ -145,14 +145,34 @@ namespace Collector.Tests
         [Test]
         public void ShouldHandleCastedSetConversion()
         {
-            Regular item = new Regular { Value = "aBc" };
+            dynamic item = new Substitute();
             PropertyInfo info = typeof(Regular).GetProperty("Value");
 
             ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
             ReflectorProperty<Regular, string> casted = property.Cast(x => x.ToLower(), x => x.ToUpper());
 
-            casted.SetValue(item, "cDe");
+            casted.SetValue((Substitute)item, () => "cDe");
             Assert.That(item.Value, Is.EqualTo("CDE"));
+        }
+
+        [Test]
+        public void ShouldHavePropertName()
+        {
+            PropertyInfo info = typeof(Regular).GetProperty("Value");
+            ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
+
+            Assert.That(property.Name, Is.EqualTo("Value"));
+        }
+
+        [Test]
+        public void ShouldStillHavePropertNameAfterCasting()
+        {
+            PropertyInfo info = typeof(Regular).GetProperty("Value");
+
+            ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
+            ReflectorProperty<Regular, string> casted = property.Cast(x => x.ToLower(), x => x.ToUpper());
+
+            Assert.That(casted.Name, Is.EqualTo("Value"));
         }
     }
 }

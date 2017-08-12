@@ -54,12 +54,13 @@
     <Compile Include="Serializer.cs" />
     <Compile Include="Sort.cs" />
     <Compile Include="SortBy.cs" />
-    <Compile Include="SortBySelector.cs" />
+    <Compile Include="SortByPredicate.cs" />
     <Compile Include="Storage.cs" />
     <Compile Include="StorageAllocation.cs" />
     <Compile Include="StoragePosition.cs" />
     <Compile Include="Substitute.cs" />
     <Compile Include="SubstituteArray.cs" />
+    <Compile Include="SubstituteText.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -33,7 +33,7 @@ namespace Collector.Tests
             Item item = new Item { Value = 0x0102030405060708 };
 
             MemoryMock memory = new MemoryMock(20);
-            member.Transfer(item, memory, 0);
+            Assert.That(member.Transfer(item, memory, 0), Is.EqualTo(8));
 
             Assert.That(memory.GetData(8), Is.EqualTo(new[]
             {
@@ -55,8 +55,26 @@ namespace Collector.Tests
                 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
             });
 
-            member.Transfer(memory, 0, item);
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(8));
             Assert.That(item.Value, Is.EqualTo(0x0102030405060708));
+        }
+
+        [Test]
+        public void ShouldNotDeserializeData()
+        {
+            PropertyInfo info = typeof(Item).GetProperty("Value");
+            ReflectorProperty<Item, Int64> property = new ReflectorProperty<Item, long>(info);
+
+            dynamic item = new Substitute();
+            Member<Item> member = new MemberInt64<Item>(property);
+
+            MemoryMock memory = new MemoryMock(new byte[]
+            {
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+            });
+
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(8));
+            Assert.That(memory.Accessed, Is.Empty);
         }
     }
 }

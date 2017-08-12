@@ -125,8 +125,8 @@ namespace Collector.Tests
             });
 
             Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(22));
-            Assert.That(item.Entries[0].Value, Is.EqualTo("abc"));
-            Assert.That(item.Entries[1].Value, Is.EqualTo("cde"));
+            Assert.That(item.Entries[0].Value.ToString(), Is.EqualTo("abc"));
+            Assert.That(item.Entries[1].Value.ToString(), Is.EqualTo("cde"));
         }
 
         [Test]
@@ -151,6 +151,30 @@ namespace Collector.Tests
 
             Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(8));
             Assert.That(item.Entries, Is.Null);
+        }
+
+        [Test]
+        public void ShouldAccessOnlyArraySize()
+        {
+            PropertyInfo valueInfo = typeof(Item).GetProperty("Entries");
+            ReflectorProperty<Item, Entry[]> valueProperty = new ReflectorProperty<Item, Entry[]>(valueInfo);
+
+            PropertyInfo nestedInfo = typeof(Entry).GetProperty("Value");
+            ReflectorProperty<Entry, String> nestedProperty = new ReflectorProperty<Entry, string>(nestedInfo);
+
+            Member<Entry> nestedMember = new MemberString<Entry>(nestedProperty);
+            Serializer<Entry> nested = new Serializer<Entry>(nestedMember);
+
+            Member<Item> member = new MemberArray<Item, Entry>(valueProperty, nested);
+            dynamic item = new Substitute();
+
+            MemoryMock memory = new MemoryMock(new byte[]
+            {
+                0x00, 0x00, 0x00, 0x08, 0xff, 0xff, 0xff, 0xff
+            });
+
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(8));
+            Assert.That(memory.Accessed, Is.EqualTo(new[] { 0, 1, 2, 3 }));
         }
     }
 }
