@@ -10,16 +10,6 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldMeasureAllMembers()
-        {
-            Serializer<Item> serializer = new Serializer<Item>(
-                new MemberMock(7), new MemberMock(13));
-
-            Item item = new Item { Value = 10 };
-            Assert.That(serializer.Measure(item), Is.EqualTo(20));
-        }
-
-        [Test]
         public void ShouldTransferItemToMemory()
         {
             Serializer<Item> serializer = new Serializer<Item>(
@@ -36,7 +26,7 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldTransferMemoryToItem()
+        public void ShouldTransferMemoryToInstance()
         {
             Serializer<Item> serializer = new Serializer<Item>(
                 new MemberMock(7), new MemberMock(13));
@@ -47,10 +37,28 @@ namespace Collector.Tests
                 130, 130, 130, 130, 130, 130, 130, 130, 130, 130
             });
 
-            dynamic item = new Substitute();
+            Item item = new Item();
             serializer.Transfer(mock, item);
 
             Assert.That(item.Value, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void ShouldTransferMemoryToSubstitute()
+        {
+            Serializer<Item> serializer = new Serializer<Item>(
+                new MemberMock(7), new MemberMock(13));
+
+            MemoryMock mock = new MemoryMock(new byte[]
+            {
+                70, 70, 70, 70, 70, 70, 70, 130, 130, 130,
+                130, 130, 130, 130, 130, 130, 130, 130, 130, 130
+            });
+
+            Substitute<Item> item = new Substitute<Item>(serializer, mock);
+            serializer.Transfer(mock, item);
+
+            Assert.That(item.AsDynamic().Value, Is.EqualTo(10));
         }
 
         private class MemberMock : Member<Item>
@@ -82,7 +90,7 @@ namespace Collector.Tests
                 return value;
             }
 
-            public int Transfer(Addressable source, long index, Substitute destination)
+            public int Transfer(Addressable source, long index, Substitute<Item> destination)
             {
                 long sum = 0;
 
@@ -92,6 +100,19 @@ namespace Collector.Tests
                 }
 
                 destination.Add("Value", () => (byte)(sum / value / value));
+                return value;
+            }
+
+            public int Transfer(Addressable source, long index, Item destination)
+            {
+                long sum = 0;
+
+                for (int i = 0; i < value; i++)
+                {
+                    sum = sum + source.Get(index + i);
+                }
+
+                destination.Value = (byte)(sum / value / value);
                 return value;
             }
         }

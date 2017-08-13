@@ -38,7 +38,7 @@ namespace Collector.Tests
             position.Increase();
             position.Increase();
 
-            Assert.That(position.Count, Is.EqualTo(2));
+            Assert.That(position.Size, Is.EqualTo(2));
         }
     }
 }

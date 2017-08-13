@@ -12,30 +12,6 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldMeasureValue()
-        {
-            PropertyInfo info = typeof(Item).GetProperty("Value");
-            ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
-
-            Member<Item> member = new MemberString<Item>(property);
-            Item item = new Item { Value = "abc" };
-
-            Assert.That(member.Measure(item), Is.EqualTo(7));
-        }
-
-        [Test]
-        public void ShouldMeasureNull()
-        {
-            PropertyInfo info = typeof(Item).GetProperty("Value");
-            ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
-
-            Member<Item> member = new MemberString<Item>(property);
-            Item item = new Item { Value = null };
-
-            Assert.That(member.Measure(item), Is.EqualTo(4));
-        }
-
-        [Test]
         public void ShouldSerializeValue()
         {
             PropertyInfo info = typeof(Item).GetProperty("Value");
@@ -67,12 +43,12 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldDeserializeValue()
+        public void ShouldDeserializeValueToInstance()
         {
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
 
-            dynamic item = new Substitute();
+            Item item = new Item();
             Member<Item> member = new MemberString<Item>(property);
 
             MemoryMock memory = new MemoryMock(new byte[]
@@ -81,21 +57,57 @@ namespace Collector.Tests
             });
 
             Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(7));
-            Assert.That(item.Value.ToString(), Is.EqualTo("abc"));
+            Assert.That(item.Value, Is.EqualTo("abc"));
         }
 
         [Test]
-        public void ShouldDeserializeNull()
+        public void ShouldDeserializeValueToSubstitute()
         {
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
 
-            dynamic item = new Substitute();
+            Member<Item> member = new MemberString<Item>(property);
+            Serializer<Item> serializer = new Serializer<Item>(member);
+
+            MemoryMock memory = new MemoryMock(new byte[]
+            {
+                0x00, 0x00, 0x00, 0x03, 0x61, 0x62, 0x63
+            });
+
+            Substitute<Item> item = new Substitute<Item>(serializer, memory);
+
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(7));
+            Assert.That(item.AsDynamic().Value.ToString(), Is.EqualTo("abc"));
+        }
+
+        [Test]
+        public void ShouldDeserializeNullToInstance()
+        {
+            PropertyInfo info = typeof(Item).GetProperty("Value");
+            ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
+
             Member<Item> member = new MemberString<Item>(property);
             MemoryMock memory = new MemoryMock(new byte[] { 0xff, 0xff, 0xff, 0xff });
+            Item item = new Item { Value = "abc" };
 
             Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(4));
             Assert.That(item.Value, Is.Null);
+        }
+
+        [Test]
+        public void ShouldDeserializeNullToSubstitute()
+        {
+            PropertyInfo info = typeof(Item).GetProperty("Value");
+            ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
+
+            Member<Item> member = new MemberString<Item>(property);
+            MemoryMock memory = new MemoryMock(new byte[] { 0xff, 0xff, 0xff, 0xff });
+
+            Serializer<Item> serializer = new Serializer<Item>(member);
+            Substitute<Item> item = new Substitute<Item>(serializer, memory);
+
+            Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(4));
+            Assert.That(item.AsDynamic().Value, Is.Null);
         }
 
         [Test]
@@ -104,13 +116,15 @@ namespace Collector.Tests
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
 
-            dynamic item = new Substitute();
             Member<Item> member = new MemberString<Item>(property);
+            Serializer<Item> serializer = new Serializer<Item>(member);
 
             MemoryMock memory = new MemoryMock(new byte[]
             {
                 0x00, 0x00, 0x00, 0x03, 0x61, 0x62, 0x63
             });
+
+            Substitute<Item> item = new Substitute<Item>(serializer, memory);
 
             Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(7));
             Assert.That(memory.Accessed, Is.EqualTo(new[] { 0, 1, 2, 3 }));
@@ -122,16 +136,18 @@ namespace Collector.Tests
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, String> property = new ReflectorProperty<Item, String>(info);
 
-            dynamic item = new Substitute();
             Member<Item> member = new MemberString<Item>(property);
+            Serializer<Item> serializer = new Serializer<Item>(member);
 
             MemoryMock memory = new MemoryMock(new byte[]
             {
                 0x00, 0x00, 0x00, 0x03, 0x61, 0x62, 0x63
             });
 
+            Substitute<Item> item = new Substitute<Item>(serializer, memory);
             Assert.That(member.Transfer(memory, 0, item), Is.EqualTo(7));
-            Assert.That(item.Value.Size, Is.EqualTo(3));
+
+            Assert.That(item.AsDynamic().Value.Size, Is.EqualTo(3));
             Assert.That(memory.Accessed, Is.EqualTo(new[] { 0, 1, 2, 3 }));
         }
     }

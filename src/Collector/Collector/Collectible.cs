@@ -4,11 +4,19 @@
     {
         private readonly Index index;
         private readonly Storage storage;
+        private readonly CollectibleFlags flags;
 
         public Collectible(int blockSize)
         {
             this.index = new Index(blockSize);
             this.storage = new Storage(blockSize);
+
+            this.flags = new CollectibleFlags
+            {
+                IsIndexed = true,
+                IsAligned = true,
+                IsSorted = true
+            };
         }
 
         public long Count
@@ -26,19 +34,45 @@
             get { return index.TotalSize + storage.TotalSize; }
         }
 
-        public void Add<T>(Serializer<T> serializer, T data)
+        public CollectibleFlags Flags
         {
-            int size = serializer.Measure(data);
-            StorageAllocation allocation = storage.Allocate(size);
-
-            index.Add(allocation.Position);
-            serializer.Transfer(data, allocation);
+            get { return flags; }
         }
 
-        public dynamic At<T>(Serializer<T> serializer, long position)
+        public void Enqueue<T>(Serializer<T> serializer, T data)
         {
-            Substitute destination = new Substitute();
+            StorageAllocation allocation = storage.Allocate();
+            index.Add(allocation.Position);
+
+            int size = serializer.Transfer(data, allocation);
+            storage.Commit(size);
+
+            flags.IsSorted = false;
+        }
+
+        public Substitute<T> Dequeue<T>(Serializer<T> serializer)
+        {
+            StorageAllocation allocation = storage.At(index.At(index.LowerBound));
+            Substitute<T> substitute = new Substitute<T>(serializer, allocation);
+
+            int size = serializer.Transfer(allocation, substitute);
+
+            storage.Release(size);
+            index.Remove();
+
+            flags.IsIndexed = false;
+            return substitute;
+        }
+
+        public void Release()
+        {
+            storage.Release();
+        }
+
+        public Substitute<T> At<T>(Serializer<T> serializer, long position)
+        {
             StorageAllocation source = storage.At(index.At(position));
+            Substitute<T> destination = new Substitute<T>(serializer, source);
 
             serializer.Transfer(source, destination);
             return destination;
@@ -47,6 +81,7 @@
         public void Swap(long left, long right)
         {
             index.Swap(left, right);
+            flags.IsAligned = false;
         }
     }
 }

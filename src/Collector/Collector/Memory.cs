@@ -17,11 +17,13 @@ namespace Collector
         {
             get
             {
+                long size = 0;
+
                 for (int i = items.Length - 1; i >= 0; i--)
                     if (items[i] != null)
-                        return i * blockSize + blockSize;
+                        size += blockSize;
 
-                return 0;
+                return size;
             }
         }
 
@@ -60,6 +62,19 @@ namespace Collector
 
                 block.SetBytes(ToMinor(index + offset), data, offset, length);
                 offset = offset + length;
+            }
+        }
+
+        public void Release(long below)
+        {
+            int major = ToMajor(below);
+
+            for (int i = major - 1; i >= 0; i--)
+            {
+                if (items[i] == null)
+                    break;
+
+                items[i] = null;
             }
         }
 

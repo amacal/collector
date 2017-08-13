@@ -32,7 +32,7 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldHaveCountedItems()
+        public void ShouldHaveNumberOfItemsWhenAdded()
         {
             Index index = new Index(1024);
 
@@ -40,6 +40,18 @@ namespace Collector.Tests
             index.Add(2345);
 
             Assert.That(index.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void ShouldHaveNumberOfItemsWhenRemoved()
+        {
+            Index index = new Index(1024);
+
+            index.Add(1245);
+            index.Add(2345);
+            index.Remove();
+
+            Assert.That(index.Count, Is.EqualTo(1));
         }
 
         [Test]

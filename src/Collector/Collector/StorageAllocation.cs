@@ -13,27 +13,27 @@
 
         public long Position
         {
-            get { return position.Value; }
+            get { return position.High; }
         }
 
         public byte Get(long index)
         {
-            return memory.Get(position.Value + index);
+            return memory.Get(position.High + index);
         }
 
         public void GetBytes(long index, byte[] data)
         {
-            memory.GetBytes(position.Value + index, data);
+            memory.GetBytes(position.High + index, data);
         }
 
         public void Set(long index, byte value)
         {
-            memory.Set(position.Value + index, value);
+            memory.Set(position.High + index, value);
         }
 
         public void SetBytes(long index, byte[] data)
         {
-            memory.SetBytes(position.Value + index, data);
+            memory.SetBytes(position.High + index, data);
         }
     }
 }

@@ -4,12 +4,17 @@ using System.Dynamic;
 
 namespace Collector
 {
-    public class Substitute : DynamicObject
+    public class Substitute<T> : DynamicObject
     {
+        private readonly Serializer<T> serializer;
+        private readonly Addressable source;
         private readonly Dictionary<string, Lazy<object>> items;
 
-        public Substitute()
+        public Substitute(Serializer<T> serializer, Addressable source)
         {
+            this.serializer = serializer;
+            this.source = source;
+
             this.items = new Dictionary<string, Lazy<object>>();
         }
 
@@ -29,6 +34,20 @@ namespace Collector
             }
 
             return base.TryGetMember(binder, out result);
+        }
+
+        public override bool TryConvert(ConvertBinder binder, out object result)
+        {
+            if (binder.Type == typeof(T))
+            {
+                T destination = Activator.CreateInstance<T>();
+                serializer.Transfer(source, destination);
+
+                result = destination;
+                return true;
+            }
+
+            return base.TryConvert(binder, out result);
         }
     }
 }

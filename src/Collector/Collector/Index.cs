@@ -4,6 +4,7 @@
     {
         private readonly Memory memory;
         private readonly IndexPosition position;
+        private long released;
 
         public Index(int blockSize)
         {
@@ -11,9 +12,14 @@
             this.position = new IndexPosition();
         }
 
+        public long LowerBound
+        {
+            get { return released; }
+        }
+
         public long Count
         {
-            get { return position.Count; }
+            get { return position.Size - released; }
         }
 
         public long UsedSize
@@ -30,6 +36,11 @@
         {
             memory.WriteInt64(position.Value, index);
             position.Increase();
+        }
+
+        public void Remove()
+        {
+            released++;
         }
 
         public long At(long index)

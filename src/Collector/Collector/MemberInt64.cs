@@ -21,20 +21,21 @@ namespace Collector
             get { return property.Name; }
         }
 
-        public int Measure(T source)
-        {
-            return 8;
-        }
-
         public int Transfer(T source, Addressable destination, long index)
         {
             destination.WriteInt64(index, property.GetValue(source));
             return 8;
         }
 
-        public int Transfer(Addressable source, long index, Substitute destination)
+        public int Transfer(Addressable source, long index, Substitute<T> destination)
         {
             destination.Add(property.Name, () => source.ReadInt64(index));
+            return 8;
+        }
+
+        public int Transfer(Addressable source, long index, T destination)
+        {
+            property.SetValue(destination, source.ReadInt64(index));
             return 8;
         }
     }

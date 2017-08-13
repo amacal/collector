@@ -9,7 +9,7 @@
             get { return value; }
         }
 
-        public long Count
+        public long Size
         {
             get { return value / 8; }
         }

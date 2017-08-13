@@ -2,30 +2,42 @@
 {
     public class StoragePosition
     {
-        private long value;
+        private long low;
+        private long high;
 
         public StoragePosition()
         {
         }
 
-        public StoragePosition(long value)
+        public StoragePosition(long low, long high)
         {
-            this.value = value;
+            this.low = low;
+            this.high = high;
         }
 
-        public long Value
+        public long Low
         {
-            get { return value; }
+            get { return low; }
+        }
+
+        public long High
+        {
+            get { return high; }
+        }
+
+        public void Decrease(int size)
+        {
+            low += size;
         }
 
         public void Increase(int size)
         {
-            value += size;
+            high += size;
         }
 
         public StoragePosition Clone()
         {
-            return new StoragePosition(value);
+            return new StoragePosition(low, high);
         }
     }
 }

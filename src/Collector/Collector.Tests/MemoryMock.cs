@@ -9,6 +9,12 @@ namespace Collector.Tests
         private readonly byte[] data;
         private readonly HashSet<long> accessed;
 
+        public MemoryMock()
+        {
+            this.data = new byte[0];
+            this.accessed = new HashSet<long>();
+        }
+
         public MemoryMock(int size)
         {
             this.data = new byte[size];

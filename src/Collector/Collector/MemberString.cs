@@ -17,14 +17,6 @@ namespace Collector
             get { return property.Name; }
         }
 
-        public int Measure(T source)
-        {
-            string value = property.GetValue(source);
-            int length = value != null ? Encoding.UTF8.GetByteCount(value) : -1;
-
-            return NormalizeLength(length);
-        }
-
         public int Transfer(T source, Addressable destination, long index)
         {
             string value = property.GetValue(source);
@@ -36,7 +28,7 @@ namespace Collector
             return NormalizeLength(length);
         }
 
-        public int Transfer(Addressable source, long index, Substitute destination)
+        public int Transfer(Addressable source, long index, Substitute<T> destination)
         {
             int length = source.ReadInt32(index + 0);
 
@@ -48,6 +40,13 @@ namespace Collector
                 return new SubstituteText(length, () => source.ReadString(index + 4, length));
             });
 
+            return NormalizeLength(length);
+        }
+
+        public int Transfer(Addressable source, long index, T destination)
+        {
+            int length = source.ReadInt32(index + 0);
+            property.SetValue(destination, source.ReadString(index + 4, length));
             return NormalizeLength(length);
         }
 

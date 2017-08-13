@@ -18,8 +18,6 @@ namespace Benchmark
             Collectible collectible = new Collectible(16 * 1024 * 1024);
             Serializer<Page> serializer = reflector.GetSerializer<Page>();
 
-            List<Page> pages = new List<Page>();
-
             using (TextReader reader = new StreamReader(@"D:\plwiki-20170720-stub-meta-history1.xml"))
             using (XmlStream stream = new XmlStream(reader))
             {
@@ -27,28 +25,32 @@ namespace Benchmark
 
                 foreach (dynamic row in stream.Open("page"))
                 {
-                    //pages.Add(GetPage(row));
-                    collectible.Add(serializer, GetPage(row));
+                    collectible.Enqueue(serializer, GetPage(row));
 
-                    //if (pages.Count % 1000 == 0)
                     if (collectible.Count % 1000 == 0)
                     {
                         GC.Collect();
-
-                        //Console.WriteLine($"{pages.Count} {Process.GetCurrentProcess().PrivateMemorySize64} {watch.Elapsed.TotalSeconds:F2}");
                         Console.WriteLine($"{collectible.Count} {collectible.UsedSize} {collectible.TotalSize} {watch.Elapsed.TotalSeconds:F2}");
                     }
                 }
             }
 
-            collectible = Sort.Table(collectible, Sort.By(serializer, x => x.Title));
+            Serializer<Revision> byRevision = reflector.GetSerializer<Revision>();
+            collectible = Select.Table(collectible, Select.One<Page, Revision>(serializer, byRevision, x => x.Revisions[0]));
+
+            GC.Collect();
             Console.WriteLine($"{collectible.Count} {collectible.UsedSize} {collectible.TotalSize} {watch.Elapsed.TotalSeconds:F2}");
 
-            for (int i = 0; i < 10; i++)
-            {
-                dynamic page = collectible.At(serializer, i);
+            collectible = Sort.Table(collectible, Sort.By(byRevision, x => x.Comment?.Size).Inverse());
 
-                Console.WriteLine($"{i} {page.Id} {page.Revisions.Length} {page.Title}");
+            GC.Collect();
+            Console.WriteLine($"{collectible.Count} {collectible.UsedSize} {collectible.TotalSize} {watch.Elapsed.TotalSeconds:F2}");
+
+            for (int i = 0; i < Math.Min(10, collectible.Count); i++)
+            {
+                Revision revision = collectible.At(byRevision, i).AsDynamic();
+
+                Console.WriteLine($"{i} {revision.Id} {revision.Comment?.Length} {revision.Comment}");
             }
 
             Console.ReadLine();

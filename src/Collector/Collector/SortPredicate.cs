@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Collector
 {
-    public class SortByPredicate<T> : SortBy
+    public class SortPredicate<T> : SortBy
     {
         private readonly Serializer<T> serializer;
         private readonly Func<dynamic, dynamic> selector;
 
-        public SortByPredicate(Serializer<T> serializer, Func<dynamic, dynamic> selector)
+        public SortPredicate(Serializer<T> serializer, Func<dynamic, dynamic> selector)
         {
             this.serializer = serializer;
             this.selector = selector;

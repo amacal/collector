@@ -8,7 +8,7 @@ namespace Collector.Tests
         public void ShouldAllocate()
         {
             Storage storage = new Storage(1024);
-            StorageAllocation allocation = storage.Allocate(256);
+            StorageAllocation allocation = storage.Allocate();
 
             Assert.That(allocation, Is.Not.Null);
             Assert.That(allocation.Position, Is.EqualTo(0));
@@ -18,10 +18,26 @@ namespace Collector.Tests
         public void ShouldAllocateNextAvailable()
         {
             Storage storage = new Storage(1024);
-            storage.Allocate(256);
+            storage.Commit(256);
 
-            StorageAllocation allocation = storage.Allocate(256);
+            StorageAllocation allocation = storage.Allocate();
             Assert.That(allocation.Position, Is.EqualTo(256));
+        }
+
+        [Test]
+        public void ShouldReleaseUnusedBlock()
+        {
+            Storage storage = new Storage(1024);
+            StorageAllocation allocation = storage.Allocate();
+
+            storage.Commit(1500);
+            allocation.Set(1499, 0);
+
+            storage.Release(1024);
+            storage.Release();
+
+            Assert.That(storage.UsedSize, Is.EqualTo(476));
+            Assert.That(storage.TotalSize, Is.EqualTo(1024));
         }
 
         [Test]
@@ -37,7 +53,10 @@ namespace Collector.Tests
         public void ShouldHaveTotalSize()
         {
             Storage storage = new Storage(1024);
-            storage.Allocate(256);
+            StorageAllocation allocation = storage.Allocate();
+
+            storage.Commit(256);
+            allocation.Set(255, 0);
 
             Assert.That(storage.TotalSize, Is.EqualTo(1024));
         }
@@ -46,7 +65,7 @@ namespace Collector.Tests
         public void ShouldHaveUsedSize()
         {
             Storage storage = new Storage(1024);
-            storage.Allocate(256);
+            storage.Commit(256);
 
             Assert.That(storage.UsedSize, Is.EqualTo(256));
         }

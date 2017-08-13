@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Collector
 {
@@ -17,14 +16,6 @@ namespace Collector
         public string Name
         {
             get { return property.Name; }
-        }
-
-        public int Measure(T source)
-        {
-            V[] value = property.GetValue(source);
-            int length = value?.Sum(nested.Measure) ?? -1;
-
-            return NormalizeLength(length);
         }
 
         public int Transfer(T source, Addressable destination, long index)
@@ -48,7 +39,7 @@ namespace Collector
             return (int)(index - initial);
         }
 
-        public int Transfer(Addressable source, long index, Substitute destination)
+        public int Transfer(Addressable source, long index, Substitute<T> destination)
         {
             int total = source.ReadInt32(index + 0);
 
@@ -59,13 +50,15 @@ namespace Collector
 
                 object[] callback()
                 {
-                    Substitute[] items = new Substitute[length];
+                    Substitute<V>[] items = new Substitute<V>[length];
                     index = index + 8;
 
                     for (int i = 0; i < length; i++)
                     {
-                        items[i] = new Substitute();
-                        index = index + nested.Transfer(source.Scope(index), items[i]);
+                        Addressable scope = source.Scope(index);
+
+                        items[i] = new Substitute<V>(nested, scope);
+                        index = index + nested.Transfer(scope, items[i]);
                     }
 
                     return items;
@@ -76,6 +69,32 @@ namespace Collector
 
                 return value;
             });
+
+            return total;
+        }
+
+        public int Transfer(Addressable source, long index, T destination)
+        {
+            int total = source.ReadInt32(index + 0);
+            int length = source.ReadInt32(index + 4);
+
+            if (length >= 0)
+            {
+                V[] items = new V[length];
+                index = index + 8;
+
+                for (int i = 0; i < length; i++)
+                {
+                    items[i] = (V)Activator.CreateInstance(typeof(V));
+                    index = index + nested.Transfer(source.Scope(index), items[i]);
+                }
+
+                property.SetValue(destination, items);
+            }
+            else
+            {
+                property.SetNull(destination);
+            }
 
             return total;
         }

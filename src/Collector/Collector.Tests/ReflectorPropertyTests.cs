@@ -56,9 +56,9 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldSetNullInNullableString()
+        public void ShouldSetNullInNullableStringInInstance()
         {
-            dynamic regular = new Substitute();
+            Regular regular = new Regular { Value = "abc" };
             PropertyInfo info = typeof(Regular).GetProperty("Value");
             ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
 
@@ -67,14 +67,42 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldSetNullInNullablePrimitive()
+        public void ShouldSetNullInNullableStringInSubstitute()
         {
-            dynamic nullable = new Substitute();
+            Addressable source = new MemoryMock();
+            Serializer<Regular> serializer = new Serializer<Regular>();
+            Substitute<Regular> regular = new Substitute<Regular>(serializer, source);
+
+            PropertyInfo info = typeof(Regular).GetProperty("Value");
+            ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
+
+            property.SetNull(regular);
+            Assert.That(regular.AsDynamic().Value, Is.Null);
+        }
+
+        [Test]
+        public void ShouldSetNullInNullablePrimitiveInInstance()
+        {
+            Nullable nullable = new Nullable();
             PropertyInfo info = typeof(Nullable).GetProperty("Value");
             ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
 
             property.SetNull(nullable);
             Assert.That(nullable.Value, Is.Null);
+        }
+
+        [Test]
+        public void ShouldSetNullInNullablePrimitiveInSubstitute()
+        {
+            Addressable source = new MemoryMock();
+            Serializer<Nullable> serializer = new Serializer<Nullable>();
+            Substitute<Nullable> nullable = new Substitute<Nullable>(serializer, source);
+
+            PropertyInfo info = typeof(Nullable).GetProperty("Value");
+            ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
+
+            property.SetNull(nullable);
+            Assert.That(nullable.AsDynamic().Value, Is.Null);
         }
 
         [Test]
@@ -98,36 +126,78 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldSetValue()
+        public void ShouldSetValueInInstance()
         {
-            dynamic regular = new Substitute();
+            Regular regular = new Regular();
             PropertyInfo info = typeof(Regular).GetProperty("Value");
             ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
 
-            property.SetValue((Substitute)regular, () => "cde");
+            property.SetValue(regular, "cde");
             Assert.That(regular.Value, Is.EqualTo("cde"));
         }
 
         [Test]
-        public void ShouldSetNullableValue()
+        public void ShouldSetValueInSubstitute()
         {
-            dynamic nullable = new Substitute();
+            Addressable source = new MemoryMock();
+            Serializer<Regular> serializer = new Serializer<Regular>();
+            Substitute<Regular> regular = new Substitute<Regular>(serializer, source);
+
+            PropertyInfo info = typeof(Regular).GetProperty("Value");
+            ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
+
+            property.SetValue(regular, () => "cde");
+            Assert.That(regular.AsDynamic().Value, Is.EqualTo("cde"));
+        }
+
+        [Test]
+        public void ShouldSetNullableValueInInstance()
+        {
+            Nullable nullable = new Nullable();
             PropertyInfo info = typeof(Nullable).GetProperty("Value");
             ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
 
-            property.SetValue((Substitute)nullable, () => 123);
+            property.SetValue(nullable, 123);
             Assert.That(nullable.Value, Is.EqualTo(123));
         }
 
         [Test]
-        public void ShouldSetNullableValueToNull()
+        public void ShouldSetNullableValueInSubstitute()
         {
-            dynamic nullable = new Substitute();
+            Addressable source = new MemoryMock();
+            Serializer<Nullable> serializer = new Serializer<Nullable>();
+            Substitute<Nullable> nullable = new Substitute<Nullable>(serializer, source);
+
             PropertyInfo info = typeof(Nullable).GetProperty("Value");
             ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
 
-            property.SetValue((Substitute)nullable, () => null);
+            property.SetValue(nullable, () => 123);
+            Assert.That(nullable.AsDynamic().Value, Is.EqualTo(123));
+        }
+
+        [Test]
+        public void ShouldSetNullableValueToNullInInstance()
+        {
+            Nullable nullable = new Nullable { Value = 10 };
+            PropertyInfo info = typeof(Nullable).GetProperty("Value");
+            ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
+
+            property.SetValue(nullable, null);
             Assert.That(nullable.Value, Is.Null);
+        }
+
+        [Test]
+        public void ShouldSetNullableValueToNullInSubstitute()
+        {
+            Addressable source = new MemoryMock();
+            Serializer<Nullable> serializer = new Serializer<Nullable>();
+            Substitute<Nullable> nullable = new Substitute<Nullable>(serializer, source);
+
+            PropertyInfo info = typeof(Nullable).GetProperty("Value");
+            ReflectorProperty<Nullable, long?> property = new ReflectorProperty<Nullable, long?>(info);
+
+            property.SetValue(nullable, () => null);
+            Assert.That(nullable.AsDynamic().Value, Is.Null);
         }
 
         [Test]
@@ -143,16 +213,32 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldHandleCastedSetConversion()
+        public void ShouldHandleCastedSetConversionInInstance()
         {
-            dynamic item = new Substitute();
+            Regular regular = new Regular();
             PropertyInfo info = typeof(Regular).GetProperty("Value");
 
             ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
             ReflectorProperty<Regular, string> casted = property.Cast(x => x.ToLower(), x => x.ToUpper());
 
-            casted.SetValue((Substitute)item, () => "cDe");
-            Assert.That(item.Value, Is.EqualTo("CDE"));
+            casted.SetValue(regular, "cDe");
+            Assert.That(regular.Value, Is.EqualTo("CDE"));
+        }
+
+        [Test]
+        public void ShouldHandleCastedSetConversionInSubstitute()
+        {
+            Addressable source = new MemoryMock();
+            Serializer<Regular> serializer = new Serializer<Regular>();
+
+            PropertyInfo info = typeof(Regular).GetProperty("Value");
+            Substitute<Regular> regular = new Substitute<Regular>(serializer, source);
+
+            ReflectorProperty<Regular, string> property = new ReflectorProperty<Regular, string>(info);
+            ReflectorProperty<Regular, string> casted = property.Cast(x => x.ToLower(), x => x.ToUpper());
+
+            casted.SetValue(regular, () => "cDe");
+            Assert.That(regular.AsDynamic().Value, Is.EqualTo("CDE"));
         }
 
         [Test]

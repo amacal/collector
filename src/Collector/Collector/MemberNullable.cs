@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Collector
+﻿namespace Collector
 {
     public class MemberNullable<T, V> : Member<T>
     {
@@ -18,14 +16,6 @@ namespace Collector
             get { return inner.Name; }
         }
 
-        public int Measure(T source)
-        {
-            if (nullable.IsNull(source))
-                return 1;
-
-            return inner.Measure(source) + 1;
-        }
-
         public int Transfer(T source, Addressable destination, long index)
         {
             if (nullable.IsNull(source))
@@ -38,7 +28,7 @@ namespace Collector
             return inner.Transfer(source, destination, index + 1) + 1;
         }
 
-        public int Transfer(Addressable source, long index, Substitute destination)
+        public int Transfer(Addressable source, long index, Substitute<T> destination)
         {
             if (source.Get(index) == 0)
             {
@@ -46,6 +36,17 @@ namespace Collector
                 return 1;
             }
 
+            return inner.Transfer(source, index + 1, destination) + 1;
+        }
+
+        public int Transfer(Addressable source, long index, T destination)
+        {
+            if (source.Get(index) == 0)
+            {
+                nullable.SetNull(destination);
+                return 1;
+            }
+;
             return inner.Transfer(source, index + 1, destination) + 1;
         }
     }

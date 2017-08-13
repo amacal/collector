@@ -12,32 +12,6 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldMeasureValue()
-        {
-            PropertyInfo info = typeof(Item).GetProperty("Value");
-            ReflectorProperty<Item, Int64?> property = new ReflectorProperty<Item, Int64?>(info);
-
-            Member<Item> member = new MemberInt64<Item>(property);
-            Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
-
-            Item item = new Item { Value = 13 };
-            Assert.That(nullable.Measure(item), Is.EqualTo(9));
-        }
-
-        [Test]
-        public void ShouldMeasureNull()
-        {
-            PropertyInfo info = typeof(Item).GetProperty("Value");
-            ReflectorProperty<Item, Int64?> property = new ReflectorProperty<Item, Int64?>(info);
-
-            Member<Item> member = new MemberInt64<Item>(property);
-            Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
-
-            Item item = new Item { Value = null };
-            Assert.That(nullable.Measure(item), Is.EqualTo(1));
-        }
-
-        [Test]
         public void ShouldSerializeValue()
         {
             PropertyInfo info = typeof(Item).GetProperty("Value");
@@ -73,7 +47,7 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldDeserializeValue()
+        public void ShouldDeserializeValueToInstance()
         {
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, Int64?> property = new ReflectorProperty<Item, Int64?>(info);
@@ -81,7 +55,7 @@ namespace Collector.Tests
             Member<Item> member = new MemberInt64<Item>(property);
             Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
 
-            dynamic item = new Substitute();
+            Item item = new Item();
             MemoryMock memory = new MemoryMock(new byte[]
             {
                 0x01, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
@@ -92,7 +66,7 @@ namespace Collector.Tests
         }
 
         [Test]
-        public void ShouldDeserializeNull()
+        public void ShouldDeserializeValueToSubstitute()
         {
             PropertyInfo info = typeof(Item).GetProperty("Value");
             ReflectorProperty<Item, Int64?> property = new ReflectorProperty<Item, Int64?>(info);
@@ -100,11 +74,49 @@ namespace Collector.Tests
             Member<Item> member = new MemberInt64<Item>(property);
             Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
 
-            dynamic item = new Substitute();
+            MemoryMock memory = new MemoryMock(new byte[]
+            {
+                0x01, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
+            });
+
+            Serializer<Item> serializer = new Serializer<Item>(nullable);
+            Substitute<Item> item = new Substitute<Item>(serializer, memory);
+
+            Assert.That(nullable.Transfer(memory, 0, item), Is.EqualTo(9));
+            Assert.That(item.AsDynamic().Value, Is.EqualTo(0x0102030405060708));
+        }
+
+        [Test]
+        public void ShouldDeserializeNullToInstance()
+        {
+            PropertyInfo info = typeof(Item).GetProperty("Value");
+            ReflectorProperty<Item, Int64?> property = new ReflectorProperty<Item, Int64?>(info);
+
+            Member<Item> member = new MemberInt64<Item>(property);
+            Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
+
+            Item item = new Item { Value = 12 };
             MemoryMock memory = new MemoryMock(new byte[] { 0x00 });
 
             Assert.That(nullable.Transfer(memory, 0, item), Is.EqualTo(1));
             Assert.That(item.Value, Is.Null);
+        }
+
+        [Test]
+        public void ShouldDeserializeNullToSubstitute()
+        {
+            PropertyInfo info = typeof(Item).GetProperty("Value");
+            ReflectorProperty<Item, Int64?> property = new ReflectorProperty<Item, Int64?>(info);
+
+            Member<Item> member = new MemberInt64<Item>(property);
+            Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
+
+            Serializer<Item> serializer = new Serializer<Item>(nullable);
+            MemoryMock memory = new MemoryMock(new byte[] { 0x00 });
+            Substitute<Item> item = new Substitute<Item>(serializer, memory);
+
+            Assert.That(nullable.Transfer(memory, 0, item), Is.EqualTo(1));
+            Assert.That(item.AsDynamic().Value, Is.Null);
         }
 
         [Test]
@@ -116,11 +128,13 @@ namespace Collector.Tests
             Member<Item> member = new MemberInt64<Item>(property);
             Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
 
-            dynamic item = new Substitute();
             MemoryMock memory = new MemoryMock(new byte[]
             {
                 0x01, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08
             });
+
+            Serializer<Item> serializer = new Serializer<Item>(nullable);
+            Substitute<Item> item = new Substitute<Item>(serializer, memory);
 
             Assert.That(nullable.Transfer(memory, 0, item), Is.EqualTo(9));
             Assert.That(memory.Accessed, Is.EqualTo(new[] { 0 }));
@@ -135,8 +149,9 @@ namespace Collector.Tests
             Member<Item> member = new MemberInt64<Item>(property);
             Member<Item> nullable = new MemberNullable<Item, Int64?>(member, property);
 
-            dynamic item = new Substitute();
             MemoryMock memory = new MemoryMock(new byte[] { 0x00 });
+            Serializer<Item> serializer = new Serializer<Item>(nullable);
+            Substitute<Item> item = new Substitute<Item>(serializer, memory);
 
             Assert.That(nullable.Transfer(memory, 0, item), Is.EqualTo(1));
             Assert.That(memory.Accessed, Is.EqualTo(new[] { 0 }));

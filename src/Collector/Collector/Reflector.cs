@@ -46,6 +46,14 @@ namespace Collector
                         new MemberInt64<T>(new ReflectorProperty<T, long?>(property)),
                         new ReflectorProperty<T, long?>(property));
 
+                case TypeCode.DateTime:
+                    if (type == property.PropertyType)
+                        return new MemberDateTime<T>(new ReflectorProperty<T, DateTime>(property));
+
+                    return new MemberNullable<T, DateTime?>(
+                        new MemberDateTime<T>(new ReflectorProperty<T, DateTime?>(property)),
+                        new ReflectorProperty<T, DateTime?>(property));
+
                 case TypeCode.String:
                     return new MemberString<T>(new ReflectorProperty<T, string>(property));
             }

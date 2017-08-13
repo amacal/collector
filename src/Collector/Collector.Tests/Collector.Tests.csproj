@@ -52,8 +52,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectorPropertyTests.cs" />
     <Compile Include="ReflectorTests.cs" />
+    <Compile Include="SelectTests.cs" />
     <Compile Include="SerializerTests.cs" />
-    <Compile Include="SortByPredicateTests.cs" />
+    <Compile Include="SortPredicateTests.cs" />
     <Compile Include="SortTests.cs" />
     <Compile Include="StorageAllocationTests.cs" />
     <Compile Include="StoragePositionTests.cs" />

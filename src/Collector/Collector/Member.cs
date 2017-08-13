@@ -4,10 +4,10 @@
     {
         string Name { get; }
 
-        int Measure(T source);
-
         int Transfer(T source, Addressable destination, long index);
 
-        int Transfer(Addressable source, long index, Substitute destination);
+        int Transfer(Addressable source, long index, Substitute<T> destination);
+
+        int Transfer(Addressable source, long index, T destination);
     }
 }

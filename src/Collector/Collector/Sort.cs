@@ -31,12 +31,47 @@ namespace Collector
             }
 
             sort(0, source.Count - 1);
+            source.Flags.IsSorted = true;
+
             return source;
         }
 
         public static SortBy By<T>(Serializer<T> serializer, Func<dynamic, dynamic> selector)
         {
-            return new SortByPredicate<T>(serializer, selector);
+            return new SortPredicate<T>(serializer, selector);
+        }
+    }
+
+    public static class SortExtensions
+    {
+        public static SortBy Inverse(this SortBy by)
+        {
+            return new SortByInverse(by);
+        }
+
+        private class SortByInverse : SortBy
+        {
+            private readonly SortBy by;
+
+            public SortByInverse(SortBy by)
+            {
+                this.by = by;
+            }
+
+            public dynamic Extract(Collectible source, long index)
+            {
+                return by.Extract(source, index);
+            }
+
+            public void Swap(Collectible source, long left, long right)
+            {
+                by.Swap(source, left, right);
+            }
+
+            public bool IsLessThan(dynamic left, dynamic right)
+            {
+                return by.IsLessThan(right, left);
+            }
         }
     }
 }

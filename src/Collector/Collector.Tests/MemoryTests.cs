@@ -21,6 +21,17 @@ namespace Collector.Tests
         }
 
         [Test]
+        public void ShouldHaveDecreasedSize()
+        {
+            Memory memory = new Memory(1024);
+
+            memory.Get(2732);
+            memory.Release(2048);
+
+            Assert.That(memory.Size, Is.EqualTo(1024));
+        }
+
+        [Test]
         public void ShouldModifyRequestedNearByte()
         {
             Memory memory = new Memory(1024);
