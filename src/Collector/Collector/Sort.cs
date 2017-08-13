@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Collector
 {
@@ -6,6 +8,31 @@ namespace Collector
     {
         public static Collectible Table(Collectible source, SortBy by)
         {
+            const int threshold = 100000;
+            ConcurrentQueue<Task> tasks = new ConcurrentQueue<Task>();
+
+            void watch()
+            {
+                Task task;
+
+                while (tasks.TryDequeue(out task))
+                {
+                    task.Wait();
+                }
+            }
+
+            void recurse(long low, long high)
+            {
+                if (high - low > threshold)
+                {
+                    tasks.Enqueue(Task.Run(() => sort(low, high)));
+                }
+                else
+                {
+                    sort(low, high);
+                }
+            }
+
             void sort(long low, long high)
             {
                 long i = low, j = high;
@@ -24,15 +51,16 @@ namespace Collector
                 }
 
                 if (low < j)
-                    sort(low, j);
+                    recurse(low, j);
 
                 if (i < high)
-                    sort(i, high);
+                    recurse(i, high);
             }
 
             sort(0, source.Count - 1);
-            source.Flags.IsSorted = true;
+            watch();
 
+            source.Flags.IsSorted = true;
             return source;
         }
 

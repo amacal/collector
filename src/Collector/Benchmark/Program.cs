@@ -23,7 +23,7 @@ namespace Benchmark
             {
                 watch.Start();
 
-                foreach (dynamic row in stream.Open("page").Take(10000))
+                foreach (dynamic row in stream.Open("page"))
                 {
                     collectible.Enqueue(serializer, GetPage(row));
 
@@ -41,7 +41,7 @@ namespace Benchmark
             GC.Collect();
             Console.WriteLine($"{collectible.Count} {collectible.UsedSize} {collectible.TotalSize} {watch.Elapsed.TotalSeconds:F2}");
 
-            collectible = Sort.Table(collectible, Sort.By(byRevision, x => x.Comment?.Size).Inverse());
+            collectible = Sort.Table(collectible, Sort.By(byRevision, x => x.Timestamp).Inverse());
 
             GC.Collect();
             Console.WriteLine($"{collectible.Count} {collectible.UsedSize} {collectible.TotalSize} {watch.Elapsed.TotalSeconds:F2}");
