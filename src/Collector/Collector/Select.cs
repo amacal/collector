@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Collector
 {
@@ -24,6 +25,11 @@ namespace Collector
         public static SelectBy One<T, U>(Serializer<T> input, Serializer<U> output, Func<dynamic, U> selector)
         {
             return new SelectOne<T, U>(input, output, selector);
+        }
+
+        public static SelectBy Many<T, U>(Serializer<T> input, Serializer<U> output, Func<dynamic, IEnumerable<U>> selector)
+        {
+            return new SelectMany<T, U>(input, output, selector);
         }
     }
 }

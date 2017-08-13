@@ -59,6 +59,7 @@
     <Compile Include="StorageAllocationTests.cs" />
     <Compile Include="StoragePositionTests.cs" />
     <Compile Include="StorageTests.cs" />
+    <Compile Include="SubstituteArrayTests.cs" />
     <Compile Include="SubstituteTests.cs" />
     <Compile Include="SubstituteTextTests.cs" />
   </ItemGroup>

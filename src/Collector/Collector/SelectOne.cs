@@ -34,4 +34,39 @@ namespace Collector
             destination.Enqueue(output, (U)value);
         }
     }
+
+    public class SelectMany<T, U> : SelectBy
+    {
+        private readonly Serializer<T> input;
+        private readonly Serializer<U> output;
+        private readonly Func<dynamic, IEnumerable<U>> selector;
+
+        public SelectMany(Serializer<T> input, Serializer<U> output, Func<dynamic, IEnumerable<U>> selector)
+        {
+            this.input = input;
+            this.output = output;
+            this.selector = selector;
+        }
+
+        public IEnumerable<dynamic> Extract(Collectible source)
+        {
+            while (source.Count > 0)
+            {
+                yield return source.Dequeue(input).AsDynamic();
+            }
+        }
+
+        public IEnumerable<dynamic> Convert(dynamic item)
+        {
+            foreach (U i in selector((object)item))
+            {
+                yield return i;
+            }
+        }
+
+        public void Enqueue(Collectible destination, dynamic value)
+        {
+            destination.Enqueue(output, (U)value);
+        }
+    }
 }

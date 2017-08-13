@@ -1,17 +1,38 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Dynamic;
 
 namespace Collector
 {
-    public class SubstituteArray : DynamicObject
+    public class SubstituteArray<T> : DynamicObject, IEnumerable
     {
         private readonly int length;
-        private readonly Lazy<object[]> items;
+        private readonly Lazy<Substitute<T>[]> items;
 
-        public SubstituteArray(int length, Func<object[]> callback)
+        public SubstituteArray(int length, Func<Substitute<T>[]> callback)
         {
             this.length = length;
-            this.items = new Lazy<object[]>(callback);
+            this.items = new Lazy<Substitute<T>[]>(callback);
+        }
+
+        public override bool TryConvert(ConvertBinder binder, out object result)
+        {
+            if (binder.Type == typeof(IEnumerable<T>))
+            {
+                IEnumerable<T> enumerate()
+                {
+                    foreach (Substitute<T> substitute in items.Value)
+                    {
+                        yield return substitute.AsDynamic();
+                    }
+                }
+
+                result = enumerate();
+                return true;
+            }
+
+            return base.TryConvert(binder, out result);
         }
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
@@ -34,6 +55,11 @@ namespace Collector
             }
 
             return base.TryGetIndex(binder, indexes, out result);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return items.Value.GetEnumerator();
         }
     }
 }

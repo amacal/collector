@@ -46,9 +46,9 @@ namespace Collector
             destination.Add(property.Name, () =>
             {
                 int length = source.ReadInt32(index + 4);
-                SubstituteArray value = null;
+                SubstituteArray<V> value = null;
 
-                object[] callback()
+                Substitute<V>[] callback()
                 {
                     Substitute<V>[] items = new Substitute<V>[length];
                     index = index + 8;
@@ -65,7 +65,7 @@ namespace Collector
                 }
 
                 if (length >= 0)
-                    value = new SubstituteArray(length, callback);
+                    value = new SubstituteArray<V>(length, callback);
 
                 return value;
             });

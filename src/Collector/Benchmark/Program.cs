@@ -23,7 +23,7 @@ namespace Benchmark
             {
                 watch.Start();
 
-                foreach (dynamic row in stream.Open("page"))
+                foreach (dynamic row in stream.Open("page").Take(10000))
                 {
                     collectible.Enqueue(serializer, GetPage(row));
 
@@ -36,7 +36,7 @@ namespace Benchmark
             }
 
             Serializer<Revision> byRevision = reflector.GetSerializer<Revision>();
-            collectible = Select.Table(collectible, Select.One<Page, Revision>(serializer, byRevision, x => x.Revisions[0]));
+            collectible = Select.Table(collectible, Select.Many(serializer, byRevision, x => x.Revisions));
 
             GC.Collect();
             Console.WriteLine($"{collectible.Count} {collectible.UsedSize} {collectible.TotalSize} {watch.Elapsed.TotalSeconds:F2}");
